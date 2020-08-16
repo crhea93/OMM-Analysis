@@ -185,3 +185,5 @@ plt.figure(figsize=(15,15));
 plt.title('Aligned and Stacked');
 plt.imshow(np.log10(sci_stacked), origin='lower', cmap='viridis', vmin=1.5, vmax=3)
 plt.savefig(output_dir+'/Final-image.png')
+
+
