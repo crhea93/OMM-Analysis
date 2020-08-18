@@ -21,14 +21,14 @@ warnings.filterwarnings('ignore')
 #---------------------------- Inputs ------------------------------------#
 home_dir = '/home/carterrhea/Dropbox/OMM/200611'
 dome_dir = 'DomeFlat'
-target_dir = 'Target/CIZAJ1824.1+3029/'
-output_dir = '/home/carterrhea/Desktop'
+target_dir = 'Target/CIZAJ1824.1+3029'
+output_dir = '/home/carterrhea/Dropbox/OMM/Lyra'
 #------------------------------------------------------------------------#
 
 
 
 os.chdir(home_dir)
-
+print('#-----Collecting Data-----#')
 bias_list = glob.glob('bias.fits')
 
 
@@ -38,7 +38,7 @@ flat_list = glob.glob(dome_dir+'/*fits')
 ## make a list of raw science images:
 sci_list = glob.glob(target_dir+'/*fits')
 
-print('#-----Collecting Data-----#')
+
 ## now put all the lists together for a masterlist of all the images:
 all_images_list = bias_list + flat_list + sci_list
 
@@ -187,3 +187,6 @@ plt.imshow(np.log10(sci_stacked), origin='lower', cmap='viridis', vmin=1.5, vmax
 plt.savefig(output_dir+'/Final-image.png')
 
 
+hdu = fits.PrimaryHDU(sci_stacked)
+hdul = fits.HDUList([hdu])
+hdul.writeto(output_dir+'/stacked.fits', overwrite=True)
