@@ -10,19 +10,22 @@ from scipy.ndimage import interpolation as interp
 
 #from skimage.feature.register_translation import (register_translation, _upsampled_dft)
 import skimage.registration as skf
+from astroquery.astrometry_net import AstrometryNet
 
 ## This turns off warnings: not a great way to code
 ## But when we show the images, sometimes we're taking the logarithm of zero and it doesn't like that
 ## Which would matter if we were doing math, but we're just taking a look at images, so we can ignore it.
 import warnings
 warnings.filterwarnings('ignore')
-
+ast = AstrometryNet()
+ast.key = 'vyihgprfjfltyhvv'
+ast.api_key = 'vyihgprfjfltyhvv'
 
 #---------------------------- Inputs ------------------------------------#
-home_dir = '/home/carterrhea/Documents/200813'
+home_dir = '/home/carterrhea/Dropbox/OMM/200813'
 dome_dir = 'DomeFlat'
 target_dir = 'Target/IC5070/'
-output_dir = '/home/carterrhea/Documents/IC5070'
+output_dir = '/home/carterrhea/Dropbox/OMM/IC5070'
 #------------------------------------------------------------------------#
 
 
@@ -192,3 +195,39 @@ for tile_ct in range(9):
     hdu = fits.PrimaryHDU(sci_stacked)
     hdul = fits.HDUList([hdu])
     hdul.writeto(output_dir+'/stacked_%i.fits'%(tile_ct+1), overwrite=True)
+
+    # Apply Astrometery using astroquery
+    try_again = True
+    submission_id = None
+    print("#-----Astrometric Corrections-----#")
+    while try_again:
+        if not submission_id:
+            try:
+                wcs_header = ast.solve_from_image(output_dir+'/stacked_%i.fits'%(tile_ct+1), submission_id=submission_id, solve_timeout=300, use_sextractor=True, center_ra=float(ra), center_dec=float(dec))
+            except Exception as e:
+                print("Timedout")
+                submission_id = e.args[1]
+            else:
+                # got a result, so terminate
+                print("Result")
+                try_again = False
+        else:
+            try:
+                wcs_header = ast.monitor_submission(submission_id, solve_timeout=300)
+            except Exception as e:
+                print("Timedout")
+                submission_id = e.args[1]
+            else:
+                # got a result, so terminate
+                print("Result")
+                try_again = False
+
+    if wcs_header:
+        # Code to execute when solve succeeds
+        hdu = fits.PrimaryHDU(header=wcs_header, data=sci_stacked)
+        hdul = fits.HDUList([hdu])
+        hdul.writeto(output_dir+'/stacked_%i.fits'%(tile_ct+1), overwrite=True)
+
+    else:
+        # Code to execute when solve fails
+        print('BAD ASTROMETRY')

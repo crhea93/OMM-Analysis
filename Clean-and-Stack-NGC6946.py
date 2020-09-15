@@ -10,6 +10,7 @@ from scipy.ndimage import interpolation as interp
 
 #from skimage.feature.register_translation import (register_translation, _upsampled_dft)
 import skimage.registration as skf
+from astroquery.astrometry_net import AstrometryNet
 
 from astropy.wcs import WCS
 from astropy import units as u
@@ -20,7 +21,10 @@ from astropy.coordinates import Angle
 import warnings
 warnings.filterwarnings('ignore')
 u.set_enabled_equivalencies(u.dimensionless_angles())
-u.deg.to('') 
+u.deg.to('')
+ast = AstrometryNet()
+ast.key = 'vyihgprfjfltyhvv'
+ast.api_key = 'vyihgprfjfltyhvv'
 
 #---------------------------- Inputs ------------------------------------#
 home_dir = '/home/carterrhea/Dropbox/OMM/200815'
@@ -33,8 +37,9 @@ output_dir = '/home/carterrhea/Dropbox/OMM/NGC6946/'+filter_
 
 
 os.chdir(home_dir)
-for tile_ct in range(6):
+for tile_ct in range(3,4):
     print('Tile %i'%(tile_ct+1))
+
     print('#-----Collecting Data-----#')
     bias_list = glob.glob('bias.fits')
 
@@ -156,14 +161,15 @@ for tile_ct in range(6):
     ## choose an image to define as zero shift:
     zero_shift_image = debias_sci_list[-1]
     hdu = fits.open(sci_list[-1])[0]
-
+    ra = hdu.header['RA']
+    dec = hdu.header['DEC']
     header_zero = WCS(fits.open(sci_list[-1])[0].header)
     pixel = Angle(0.459211, u.arcsec)
-    header_zero.wcs.crpix = [512, 272] # center pixel
+    header_zero.wcs.crpix = [512, 512] # center pixel
 
     header_zero.wcs.crval = [hdu.header['RA'], hdu.header['DEC']] # RA and dec values in hours and degrees
 
-    header_zero.wcs.ctype = ["", ""]
+    header_zero.wcs.ctype = ["RA", "DEC"]
 
     header_zero.wcs.cdelt = [pixel.degree, pixel.degree]
     ## find all shifts for other images:
@@ -195,16 +201,50 @@ for tile_ct in range(6):
     ## average combined final image:
     sci_stacked = np.average(scicube, axis=0)
 
-
-        ## show the final image array as an image:
+    ## show the final image array as an image:
     plt.subplot(projection=header_zero)
     plt.title('Aligned and Stacked');
     plt.imshow(np.log10(sci_stacked), origin='lower', cmap='viridis', vmin=1.5, vmax=3)
     plt.savefig(output_dir+'/Final-image_%i.png'%(tile_ct+1))
 
-
-    
+    ## Create original fits before astrometry correction
     header = header_zero.to_header()
-    hdu = fits.PrimaryHDU(header=header, data=sci_stacked)
+    hdu = fits.PrimaryHDU(data=sci_stacked)
     hdul = fits.HDUList([hdu])
     hdul.writeto(output_dir+'/stacked_%i.fits'%(tile_ct+1), overwrite=True)
+
+    # Apply Astrometery using astroquery
+    try_again = True
+    submission_id = None
+    print("#-----Astrometric Corrections-----#")
+    while try_again:
+        if not submission_id:
+            try:
+                wcs_header = ast.solve_from_image(output_dir+'/stacked_%i.fits'%(tile_ct+1), submission_id=submission_id, solve_timeout=300, use_sextractor=True, center_ra=float(ra), center_dec=float(dec))
+            except Exception as e:
+                print("Timedout")
+                submission_id = e.args[1]
+            else:
+                # got a result, so terminate
+                print("Result")
+                try_again = False
+        else:
+            try:
+                wcs_header = ast.monitor_submission(submission_id, solve_timeout=300)
+            except Exception as e:
+                print("Timedout")
+                submission_id = e.args[1]
+            else:
+                # got a result, so terminate
+                print("Result")
+                try_again = False
+
+    if wcs_header:
+        # Code to execute when solve succeeds
+        hdu = fits.PrimaryHDU(header=wcs_header, data=sci_stacked)
+        hdul = fits.HDUList([hdu])
+        hdul.writeto(output_dir+'/stacked_%i.fits'%(tile_ct+1), overwrite=True)
+
+    else:
+        # Code to execute when solve fails
+        print('BAD ASTROMETRY')
