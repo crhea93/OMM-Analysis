@@ -6,7 +6,7 @@ import shutil
 from astropy.io import fits
 
 #---------------------------- Inputs ------------------------------------#
-home_dir = '/home/carterrhea/Dropbox/OMM/200815'
+home_dir = '/export/carterrhea/OMM-Data/200815'
 target_dir = 'Target/NGC6946_pos6'
 #------------------------------------------------------------------------#
 
@@ -23,7 +23,7 @@ for filename in os.listdir(home_dir+'/'+target_dir):  # Step through each fits f
             filter_images[filter].append(filename)  # add to list of filenames with filter
         else:  # filter not in dictionary
             filter_images[filter] = [filename]  # Start list of filenames in filter
-
+print(filter_images.keys())
 for filter in filter_images.keys():  # Step through each filter
     # Create new folders for each filter
     try:

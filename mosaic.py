@@ -9,15 +9,17 @@ from reproject import reproject_interp
 from reproject.mosaicking import reproject_and_coadd
 from reproject.mosaicking import find_optimal_celestial_wcs
 #----------------------------INPUTS-------------------------------#
-sci_dir = "/home/carterrhea/Dropbox/OMM/NGC6946/Ha'"
+sci_dir = "/export/carterrhea/OMM-Data/NGC6946/Ha'"
 output_dir = sci_dir
 #-----------------------------------------------------------------#
 
 sci_hdus = []  # List of science images
 for filename in os.listdir(sci_dir):
-    if filename.endswith('.fits') and filename.startswith('stacked'):
+    if filename.endswith('.fits') and filename.startswith('stacked_correct'):
         hdu = fits.open(sci_dir+'/'+filename)
         sci_hdus.append(hdu)
+
+print(sci_hdus)
 print("#-----Calculaing WCS-----#")
 wcs_out, shape_out = find_optimal_celestial_wcs(sci_hdus, auto_rotate=True)
 print("#-----Reprojecting-----#")

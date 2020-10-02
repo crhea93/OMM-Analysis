@@ -25,19 +25,18 @@ u.deg.to('')
 ast = AstrometryNet()
 ast.key = 'vyihgprfjfltyhvv'
 ast.api_key = 'vyihgprfjfltyhvv'
-
 #---------------------------- Inputs ------------------------------------#
-home_dir = '/home/carterrhea/Dropbox/OMM/200815'
+home_dir = '/export/carterrhea/OMM-Data/200815'
 dome_dir = 'DomeFlat'
 target_dir = 'Target/NGC6946'
 filter_ = "Ha'"
-output_dir = '/home/carterrhea/Dropbox/OMM/NGC6946/'+filter_
+output_dir = '/export/carterrhea/OMM-Data/NGC6946/'+filter_
 #------------------------------------------------------------------------#
 
 
 
 os.chdir(home_dir)
-for tile_ct in range(3,4):
+for tile_ct in range(0,6):
     print('Tile %i'%(tile_ct+1))
 
     print('#-----Collecting Data-----#')
@@ -112,7 +111,7 @@ for tile_ct in range(3,4):
     master_flat = np.average(flatcube, axis=0)
 
     ## Created normalized master
-    normalized_master_flat = master_flat/np.mean(master_flat)
+    normalized_master_flat = master_flat/np.median(master_flat)
 
 
 
@@ -220,7 +219,7 @@ for tile_ct in range(3,4):
     while try_again:
         if not submission_id:
             try:
-                wcs_header = ast.solve_from_image(output_dir+'/stacked_%i.fits'%(tile_ct+1), submission_id=submission_id, solve_timeout=300, use_sextractor=True, center_ra=float(ra), center_dec=float(dec))
+                wcs_header = ast.solve_from_image(output_dir+'/stacked_%i.fits'%(tile_ct+1), submission_id=submission_id, solve_timeout=300)#, use_sextractor=True, center_ra=float(ra), center_dec=float(dec))
             except Exception as e:
                 print("Timedout")
                 submission_id = e.args[1]
@@ -243,7 +242,7 @@ for tile_ct in range(3,4):
         # Code to execute when solve succeeds
         hdu = fits.PrimaryHDU(header=wcs_header, data=sci_stacked)
         hdul = fits.HDUList([hdu])
-        hdul.writeto(output_dir+'/stacked_%i.fits'%(tile_ct+1), overwrite=True)
+        hdul.writeto(output_dir+'/stacked_correct_%i.fits'%(tile_ct+1), overwrite=True)
 
     else:
         # Code to execute when solve fails
