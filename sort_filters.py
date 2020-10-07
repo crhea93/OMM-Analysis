@@ -6,8 +6,8 @@ import shutil
 from astropy.io import fits
 
 #---------------------------- Inputs ------------------------------------#
-home_dir = '/export/carterrhea/OMM-Data/200815'
-target_dir = 'Target/NGC6946_pos6'
+home_dir = '/export/carterrhea/OMM-Data/200315'
+target_dir = 'Target/NGC3344_pos9'
 #------------------------------------------------------------------------#
 
 # Sort science images by filter
@@ -18,7 +18,10 @@ for filename in os.listdir(home_dir+'/'+target_dir):  # Step through each fits f
     if filename.endswith('.fits'):  # Only get fits files
         hdu = fits.open(home_dir+'/'+target_dir+'/'+filename)  # Open Fits
         header = hdu[0].header  # Get Header
-        filter = header['FILTER']  # Get filter
+        try:
+            filter = header['FILTER']  # Get filter
+        except:
+            filter = header['FILTRE']
         if filter in filter_images.keys():  # If we already have the filter in the dictionary
             filter_images[filter].append(filename)  # add to list of filenames with filter
         else:  # filter not in dictionary

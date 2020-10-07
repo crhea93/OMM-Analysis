@@ -9,7 +9,8 @@ from reproject import reproject_interp
 from reproject.mosaicking import reproject_and_coadd
 from reproject.mosaicking import find_optimal_celestial_wcs
 #----------------------------INPUTS-------------------------------#
-sci_dir = "/home/carterrhea/Dropbox/OMM/NGC6946/Ha'"
+
+sci_dir = "/export/carterrhea/OMM-Data/NGC3344/g'"
 output_dir = sci_dir
 #-----------------------------------------------------------------#
 
