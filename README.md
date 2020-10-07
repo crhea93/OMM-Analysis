@@ -13,6 +13,13 @@ Before running the code, be sure to have unzipped all Target and DomeFlats. You 
 go to their directories and type `gunzip *` to unzip the files. Additionally,
 the bias.fits file must be in the home directory!
 
-Simple change the imports at the beginning of the file: Clean-and-Stack.py
+Simple change the imports at the beginning of the file: sort_filters.py and Clean-and-Stack.py and mosaic.py
 
-to run simply type: python Clean-and-Stack.py
+to run simply type:
+1 - python sort_filters.py
+2 - python Clean-and-Stack.py
+3 - python mosaic.py
+
+I have created a number of additional Clean-and-Stack files for specific galaxies.
+Sometimes, astrometry.net fails to solve for the coordinates for certain tiles in a mosaic. If this
+is the case, the code will not create the *corrected* fits files. To create the corrected fits files, use the FinalAlignment.ipynb to manually align and calculate the coordinates :P
