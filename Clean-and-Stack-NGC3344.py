@@ -12,28 +12,33 @@ from scipy.ndimage import interpolation as interp
 import skimage.registration as skf
 from astroquery.astrometry_net import AstrometryNet
 
+from astropy.wcs import WCS
+from astropy import units as u
+from astropy.coordinates import Angle
 ## This turns off warnings: not a great way to code
 ## But when we show the images, sometimes we're taking the logarithm of zero and it doesn't like that
 ## Which would matter if we were doing math, but we're just taking a look at images, so we can ignore it.
 import warnings
 warnings.filterwarnings('ignore')
+u.set_enabled_equivalencies(u.dimensionless_angles())
+u.deg.to('')
 ast = AstrometryNet()
 ast.key = 'vyihgprfjfltyhvv'
 ast.api_key = 'vyihgprfjfltyhvv'
-
 #---------------------------- Inputs ------------------------------------#
-home_dir = '/export/carterrhea/OMM-Data/200831'
+home_dir = '/export/carterrhea/OMM-Data/200315'
 dome_dir = 'DomeFlat'
-target_dir = 'Target/IC5070'
-filter_ = "Ha'"
-output_dir = '/export/carterrhea/OMM-Data/IC5070/'+filter_
+target_dir = 'Target/NGC3344'
+filter_ = "g'"
+output_dir = '/export/carterrhea/OMM-Data/NGC3344/'+filter_
 #------------------------------------------------------------------------#
 
 
 
 os.chdir(home_dir)
-for tile_ct in range(9):
+for tile_ct in range(0,9):
     print('Tile %i'%(tile_ct+1))
+
     print('#-----Collecting Data-----#')
     bias_list = glob.glob('bias.fits')
 
@@ -42,7 +47,7 @@ for tile_ct in range(9):
     flat_list = glob.glob(dome_dir+'/*fits')
 
     ## make a list of raw science images:
-    sci_list = glob.glob(target_dir+'/'+filter_+'/*fits')[tile_ct*300:(tile_ct+1)*300]
+    sci_list = glob.glob(target_dir+'_pos'+str(tile_ct+1)+'/'+filter_+'/*fits')
 
 
     ## now put all the lists together for a masterlist of all the images:
@@ -106,7 +111,7 @@ for tile_ct in range(9):
     master_flat = np.average(flatcube, axis=0)
 
     ## Created normalized master
-    normalized_master_flat = master_flat/np.mean(master_flat)
+    normalized_master_flat = master_flat/np.median(master_flat)
 
 
 
@@ -154,7 +159,18 @@ for tile_ct in range(9):
     print('#-----Aligning Images-----#')
     ## choose an image to define as zero shift:
     zero_shift_image = debias_sci_list[-1]
+    hdu = fits.open(sci_list[-1])[0]
+    ra = hdu.header['RA']
+    dec = hdu.header['DEC']
+    header_zero = WCS(fits.open(sci_list[-1])[0].header)
+    pixel = Angle(0.459211, u.arcsec)
+    header_zero.wcs.crpix = [512, 512] # center pixel
 
+    header_zero.wcs.crval = [hdu.header['RA'], hdu.header['DEC']] # RA and dec values in hours and degrees
+
+    header_zero.wcs.ctype = ["RA", "DEC"]
+
+    header_zero.wcs.cdelt = [pixel.degree, pixel.degree]
     ## find all shifts for other images:
     imshifts = {} # dictionary to hold the x and y shift pairs for each image
     for image in debias_sci_list:
@@ -184,16 +200,15 @@ for tile_ct in range(9):
     ## average combined final image:
     sci_stacked = np.average(scicube, axis=0)
 
-
-        ## show the final image array as an image:
-    plt.figure(1)
-    plt.figure(figsize=(15,15));
+    ## show the final image array as an image:
+    plt.subplot(projection=header_zero)
     plt.title('Aligned and Stacked');
     plt.imshow(np.log10(sci_stacked), origin='lower', cmap='viridis', vmin=1.5, vmax=3)
     plt.savefig(output_dir+'/Final-image_%i.png'%(tile_ct+1))
 
-
-    hdu = fits.PrimaryHDU(sci_stacked)
+    ## Create original fits before astrometry correction
+    header = header_zero.to_header()
+    hdu = fits.PrimaryHDU(data=sci_stacked)
     hdul = fits.HDUList([hdu])
     hdul.writeto(output_dir+'/stacked_%i.fits'%(tile_ct+1), overwrite=True)
 
