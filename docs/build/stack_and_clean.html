@@ -1,0 +1,253 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>&lt;no title&gt; &mdash; Optical Imager Reduction Pipeline 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Optical Imager Reduction Pipeline
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Optical Imager Reduction Pipeline</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>&lt;no title&gt;</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/stack_and_clean.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="toctree-wrapper compound" id="pipeline">
+</div>
+<span class="target" id="module-stack_and_clean.stack_and_clean"></span><p>Master routine for cleaning, stacking, and astrometrically correcting images</p>
+<p>This routine assumes that the data are organized by exposure group. For example,
+if there are 3 exposure groups (or positions), the target folder contains three sub-directories
+labeled (in some manner), target_pos1, target_pos2, target_pos3. This format was adopted
+as it is the standard format for OMM PESTO observations. We also assume that the
+bias fits file is in the home directory (home_dir).</p>
+<p>The inputs are read through the input file (.i). The user must supply the following:</p>
+<ol class="arabic simple">
+<li><p>home_dir (str): Path (absolute or relative) to the data repo; e.x. ‘/home/user/OMM/200xxx’</p></li>
+<li><p>dome_dir (str): Relative path to the dome flats wrt to home_dir; e.x. ‘DomeFlat’</p></li>
+<li><p>target_dir (str): Relative path to the target directory wrt home_dir; e.x. ‘Target/M33’</p></li>
+<li><p>filter (str): Filter name (can be found in header of targets); e.x. “Ha’”</p></li>
+<li><p>pos_dil (str): Dilimeter for position repository names; e.x. ‘_pos’</p></li>
+<li><p>output0_dir (str): Path (absolute or relative) to the output repo; e.x. ‘/home/user/OMM/200xxx/Outputs’</p></li>
+<li><p>num_pos (str): Number of positions taken; e.x. 3</p></li>
+<li><p>api_key (str): Astronomy.net API key</p></li>
+</ol>
+<p>This code was inspired by a jupyter notebook written by Amanda Townsend which can be found here:
+<a class="reference external" href="https://users.astro.ufl.edu/~ajtownsend/OBSTECH_REDUX_2017.html">https://users.astro.ufl.edu/~ajtownsend/OBSTECH_REDUX_2017.html</a></p>
+<span class="target" id="module-sort_filters.sort_filters"></span><p>Python script to sort OMM observations by filter</p>
+<p>Reads in input file containing a home directory and target directory:</p>
+<ol class="arabic simple">
+<li><p>home_dir (str): Path (absolute or relative) to the data repo; e.x. ‘/home/user/OMM/200xxx’</p></li>
+<li><p>target_dir (str): Relative path to the target directory wrt home_dir; e.x. ‘Target/M33’</p></li>
+<li><p>filter (str): Filter name (can be found in header of targets); e.x. “Ha’”</p></li>
+<li><p>pos_dil (str): Dilimeter for position repository names; e.x. ‘_pos’</p></li>
+<li><p>num_pos (str): Number of positions taken; e.x. 3</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">returns</dt>
+<dd class="field-odd"><p>Creates new repos in target directory for each filter</p>
+</dd>
+</dl>
+<span class="target" id="module-astrometry.astrometry"></span><p>Apply astrometry using astrometry.net</p>
+<p>If the astrometry fails, then you will receive a notice. If that is the case, then
+please use the final alignment notebook to correct the astrometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param output_dir</dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">param tile_ct</dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">param sci_stacked</dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">param api_key</dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">param output_dir</dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">returns</dt>
+<dd class="field-even"><p>Creates corrected fits files</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Requires an astrometry.net account</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Carter Rhea
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

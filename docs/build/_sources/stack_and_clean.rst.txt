@@ -1,0 +1,15 @@
+.. _pipeline:
+
+.. toctree::
+   :maxdepth: 2
+
+
+.. automodule:: stack_and_clean.stack_and_clean
+    :members:
+    
+.. automodule:: sort_filters.sort_filters
+    :members:
+    
+.. automodule:: astrometry.astrometry
+    :members:
+
