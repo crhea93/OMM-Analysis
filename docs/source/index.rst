@@ -63,3 +63,5 @@ Indices and tables
 The software is protected under the :ref:`license`.
 
 If you have any questions, please message me at carter.rhea@umontreal.ca
+
+We acknowledge the work done by Amanda Townsend on the stacking and cleaning portion of the code.
