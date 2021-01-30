@@ -99,7 +99,6 @@ def stack_and_clean(sys_arg):
         plt.clf()
         ## Align images
         print('  #-----Aligning Images-----#')
-        # Choose an image to define as zero shift:
         align(target_images, debias_sci_list, debias_data_out, flat_debias_sci_list, inputs['output_dir'], tile_ct)
         print('  #-----Applying Astrometry-----#')
         # Use astrometry.net to calculate the true wcs

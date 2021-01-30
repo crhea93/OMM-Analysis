@@ -7,20 +7,20 @@ from astropy import units as u
 import skimage.registration as skf
 from astropy.coordinates import Angle
 
-warnings.filterwarnings('ignore')
-u.set_enabled_equivalencies(u.dimensionless_angles())
-u.deg.to('')
+#warnings.filterwarnings('ignore')
+#u.set_enabled_equivalencies(u.dimensionless_angles())
+#u.deg.to('')
 
 
 def align(target_images, debias_sci_list, debias_data_out,flat_debias_sci_list, output_dir, tile_ct):
-    """
+    '''
     Align debiased and master-flat-subtracted science images. We use phase cross-correlation to
     calculate the offset between images. We then apply those offsets using numpy roll.
     Finally, we restack the images (and take their average) to create a final aligned image
     for the position. The output fits is called stacked_%tile_ct.fits
 
     Args:
-        target_images (list): List of science arrays (biased)
+        target_images (list): List of science arrays -- baised
         debias_sci_list (list): List of debiased science Data
         debias_data_out (dict): Dictionary of debiased science data
         flat_debias_sci_list (list): List of flat-subtracted, debiased science data
@@ -29,7 +29,7 @@ def align(target_images, debias_sci_list, debias_data_out,flat_debias_sci_list, 
 
     Returns:
         Creates aligned images using phase cross-correlation
-    """
+    '''
     hdu = fits.open(target_images[-1])[0]  # Choose last unbiased one to get header info
     zero_shift_image = debias_sci_list[-1]
     ra = hdu.header['RA']

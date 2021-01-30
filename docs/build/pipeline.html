@@ -84,8 +84,9 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Reduction Pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-stack_and_clean.stack_and_clean">Stack and Clean Wrapper Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-sort_filters.sort_filters">Sort Filters Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stack_and_clean.stack_and_clean">Stack and Clean Wrapper Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-Align.align">Align Filters Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-astrometry.astrometry">Astrometry Module</a></li>
 </ul>
 </li>
@@ -156,7 +157,25 @@
             
   <div class="section" id="reduction-pipeline">
 <span id="pipeline"></span><h1>Reduction Pipeline<a class="headerlink" href="#reduction-pipeline" title="Permalink to this headline">¶</a></h1>
+<p>We first sort the images based on the filter used. We then clean and stack the images, align them, and finally add astrometry.</p>
 <div class="toctree-wrapper compound">
+</div>
+<div class="section" id="module-sort_filters.sort_filters">
+<span id="sort-filters-module"></span><h2>Sort Filters Module<a class="headerlink" href="#module-sort_filters.sort_filters" title="Permalink to this headline">¶</a></h2>
+<p>Python script to sort OMM observations by filter</p>
+<p>Reads in input file containing a home directory and target directory:</p>
+<ol class="arabic simple">
+<li><p>home_dir (str): Path (absolute or relative) to the data repo; e.x. ‘/home/user/OMM/200xxx’</p></li>
+<li><p>target_dir (str): Relative path to the target directory wrt home_dir; e.x. ‘Target/M33’</p></li>
+<li><p>filter (str): Filter name (can be found in header of targets); e.x. “Ha’”</p></li>
+<li><p>pos_dil (str): Dilimeter for position repository names; e.x. ‘_pos’</p></li>
+<li><p>num_pos (str): Number of positions taken; e.x. 3</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">returns</dt>
+<dd class="field-odd"><p>Creates new repos in target directory for each filter</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="module-stack_and_clean.stack_and_clean">
 <span id="stack-and-clean-wrapper-module"></span><h2>Stack and Clean Wrapper Module<a class="headerlink" href="#module-stack_and_clean.stack_and_clean" title="Permalink to this headline">¶</a></h2>
@@ -180,20 +199,51 @@ bias fits file is in the home directory (home_dir).</p>
 <p>This code was inspired by a jupyter notebook written by Amanda Townsend which can be found here:
 <a class="reference external" href="https://users.astro.ufl.edu/~ajtownsend/OBSTECH_REDUX_2017.html">https://users.astro.ufl.edu/~ajtownsend/OBSTECH_REDUX_2017.html</a></p>
 </div>
-<div class="section" id="module-sort_filters.sort_filters">
-<span id="sort-filters-module"></span><h2>Sort Filters Module<a class="headerlink" href="#module-sort_filters.sort_filters" title="Permalink to this headline">¶</a></h2>
-<p>Python script to sort OMM observations by filter</p>
-<p>Reads in input file containing a home directory and target directory:</p>
-<ol class="arabic simple">
-<li><p>home_dir (str): Path (absolute or relative) to the data repo; e.x. ‘/home/user/OMM/200xxx’</p></li>
-<li><p>target_dir (str): Relative path to the target directory wrt home_dir; e.x. ‘Target/M33’</p></li>
-<li><p>filter (str): Filter name (can be found in header of targets); e.x. “Ha’”</p></li>
-<li><p>pos_dil (str): Dilimeter for position repository names; e.x. ‘_pos’</p></li>
-<li><p>num_pos (str): Number of positions taken; e.x. 3</p></li>
-</ol>
+<div class="section" id="module-Align.align">
+<span id="align-filters-module"></span><h2>Align Filters Module<a class="headerlink" href="#module-Align.align" title="Permalink to this headline">¶</a></h2>
+<p>Align debiased and master-flat-subtracted science images. We use phase cross-correlation to
+calculate the offset between images. We then apply those offsets using numpy roll.
+Finally, we restack the images (and take their average) to create a final aligned image
+for the position. The output fits is called stacked_%tile_ct.fits</p>
 <dl class="field-list simple">
+<dt class="field-odd">param target_images</dt>
+<dd class="field-odd"><p>List of science arrays (biased)</p>
+</dd>
+<dt class="field-even">type target_images</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+<dt class="field-odd">param debias_sci_list</dt>
+<dd class="field-odd"><p>List of debiased science Data</p>
+</dd>
+<dt class="field-even">type debias_sci_list</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+<dt class="field-odd">param debias_data_out</dt>
+<dd class="field-odd"><p>Dictionary of debiased science data</p>
+</dd>
+<dt class="field-even">type debias_data_out</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">param flat_debias_sci_list</dt>
+<dd class="field-odd"><p>List of flat-subtracted, debiased science data</p>
+</dd>
+<dt class="field-even">type flat_debias_sci_list</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+<dt class="field-odd">param output_dir</dt>
+<dd class="field-odd"><p>Output directory path</p>
+</dd>
+<dt class="field-even">type output_dir</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param tile_ct</dt>
+<dd class="field-odd"><p>Position count</p>
+</dd>
+<dt class="field-even">type tile_ct</dt>
+<dd class="field-even"><p>int</p>
+</dd>
 <dt class="field-odd">returns</dt>
-<dd class="field-odd"><p>Creates new repos in target directory for each filter</p>
+<dd class="field-odd"><p>Creates aligned images using phase cross-correlation</p>
 </dd>
 </dl>
 </div>
