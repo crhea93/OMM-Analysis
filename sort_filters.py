@@ -46,17 +46,19 @@ def sort_filters(sys_arg):
                 else:  # filter not in dictionary
                     filter_images[filter] = [filename]  # Start list of filenames in filter
         filters_ = ''
-        print('Filters:')
+        #print('Filters:')
         for key in filter_images.keys():
             filters_ += key+' '
-        print('Filters: ' + filters_)
-        print()
+        print('Position: ' + str(tile_ct+1))
+        print('    Filters: ' + filters_)
+        # Create target folder
         for filter in filter_images.keys():  # Step through each filter
             # Create new folders for each filter
-            try:
-                os.mkdir(home_dir+'/'+target_dir+'/'+filter)
-            except:
+
+            if os.path.exists(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+filter):
                 pass
+            else:
+                os.mkdir(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+filter)
             for filename in filter_images[filter]:
                 shutil.copyfile(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+filename, home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+inputs['filter_']+'/'+filename)
     os.chdir(curr_dir)

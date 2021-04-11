@@ -1,4 +1,5 @@
 from astroquery.astrometry_net import AstrometryNet
+from astropy.io import fits
 ast = AstrometryNet()
 
 
