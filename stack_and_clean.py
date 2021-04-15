@@ -48,6 +48,10 @@ def stack_and_clean(sys_arg):
         os.makedirs(inputs['output_dir'])
     # Read in bias file
     bias = fits.getdata('bias.fits')
+    #if os.path.exists('bias.fits'):
+    #    bias = fits.getdata('bias.fits')
+    #else:
+    #    bias = None
     # We will iterate through each position
     for tile_ct in range(0, int(inputs['num_pos'])):
         print('#-----On Position %i-----#'%(tile_ct+1))
@@ -61,9 +65,10 @@ def stack_and_clean(sys_arg):
         flatcube = np.stack([raw_image_data[flat_frame] for flat_frame in dome_flats],axis=0)
         ## create an array of raw science images
         scicube = np.stack([raw_image_data[science_frame] for science_frame in target_images],axis=0)
-        #plt.imshow(scicube[0])
-        #plt.show()
         print('  #-----Generating Master Bias and Flat-----#')
+        #if bias == None:
+            #master_bias = np.zeros_like(scicube[0])
+        #else:
         master_bias = bias
         # filneames of flats and science frames that have not yet been bias-subtracted:
         debias_list_in = target_images + dome_flats
@@ -82,15 +87,11 @@ def stack_and_clean(sys_arg):
         ## create an array of debiased v-flat images
         flatcube = np.stack([debias_data_out[flat_frame] for flat_frame in debias_flat_list],axis=0)
         ## average the images in the stack
-        master_flat = np.average(flatcube, axis=0)
+        master_flat = np.median(flatcube, axis=0)
         ## Created normalized master
         normalized_master_flat = master_flat/np.mean(master_flat)
         ## we'll start with a list of the debiased science images:
         debias_sci_list = [im.strip('.fits') + "_debiased.fits" for im in target_images]
-        #plt.imshow(debias_sci_list[0])
-        #plt.show()
-        #plt.clf()
-        print(debias_sci_list[0])
         ## and we'll make a corresponding list to name the flattened images:
         flat_debias_sci_list = [im.strip('.fits') + "_flattened.fits" for im in debias_sci_list]
         ## create an empty dictionary to populate with the completely corrected science frames:
@@ -103,12 +104,9 @@ def stack_and_clean(sys_arg):
         ## array of images + average combine:
         sci_cube = np.stack(flat_debias_data_out.values(),axis=0)
         sci_stacked = np.average(sci_cube, axis=0)
-        #hdu = fits.PrimaryHDU(data=sci_stacked)
-        #hdul = fits.HDUList([hdu])
-        #hdul.writeto('stacked_%i_fake.fits'%(tile_ct+1), overwrite=True)
         ## Align images
         print('  #-----Aligning Images-----#')
-        align(target_images, debias_sci_list, debias_data_out, flat_debias_sci_list, inputs['output_dir'], tile_ct)
+        sci_stacked = align(target_images, debias_sci_list, debias_data_out, flat_debias_sci_list, inputs['output_dir'], tile_ct)
         print('  #-----Applying Astrometry-----#')
         # Use astrometry.net to calculate the true wcs
         astrometry(inputs['output_dir'], tile_ct, sci_stacked, inputs['api_key'])

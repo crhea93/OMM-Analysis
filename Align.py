@@ -64,10 +64,11 @@ def align(target_images, debias_sci_list, debias_data_out,flat_debias_sci_list, 
     scicube  = np.stack(shifted_sci_data.values(),axis=0)
 
     ## average combined final image:
-    sci_stacked = np.average(scicube, axis=0)
+    sci_stacked = np.median(scicube, axis=0)
 
     # Create original fits before astrometry correction after alignment
     header = header_zero.to_header()
     hdu = fits.PrimaryHDU(data=sci_stacked)
     hdul = fits.HDUList([hdu])
     hdul.writeto(output_dir+'/stacked_%i.fits'%(tile_ct+1), overwrite=True)
+    return sci_stacked
