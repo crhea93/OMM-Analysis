@@ -12,8 +12,8 @@ from reproject.mosaicking import find_optimal_celestial_wcs
 
 sci_dir = "/home/carterrhea/Documents/"
 name = 'M101'
-band = 'z'
-sci_dir = sci_dir + name + '/z/'
+band = 'i'
+sci_dir = sci_dir + name + '/'+band+'/'
 output_dir = sci_dir
 #-----------------------------------------------------------------#
 sci_hdus = []  # List of science images
