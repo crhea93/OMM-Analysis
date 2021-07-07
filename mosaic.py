@@ -18,9 +18,10 @@ output_dir = sci_dir'''
 #-----------------------------------------------------------------#
 def mosaic(sys_arg):
 	inputs = read_input_file(sys_arg)
-	output_dir = sci_dir
+	#output_dir = sci_dir
 	name = inputs['target_dir'].split('/')[-1]
-	sci_dir = inputs['output_dir']+'/'+name+'/'+inputs['filter']
+	sci_dir = inputs['output_dir']#+'/'+name+'/'+inputs['filter_']
+
 	sci_hdus = []  # List of science images
 	for filename in os.listdir(sci_dir):
 		if filename.endswith('.fits') and filename.startswith('stacked_correct'):
@@ -44,9 +45,9 @@ def mosaic(sys_arg):
 	ax2 = plt.subplot(1, 2, 2)
 	im2 = ax2.imshow(footprint, origin='lower')
 	ax2.set_title('Footprint')
-	plt.savefig(output_dir+'/mosaic.png')
+	plt.savefig(sci_dir+'/mosaic.png')
 
 	print('#-----Making Fits-----#')
 	hdu = fits.PrimaryHDU(header=wcs_out.to_header(), data=array)
 	hdul = fits.HDUList([hdu])
-	hdul.writeto(output_dir+'/'+name+'.fits', overwrite=True)
+	hdul.writeto(sci_dir+'/'+name+'.fits', overwrite=True)

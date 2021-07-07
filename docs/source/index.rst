@@ -1,8 +1,8 @@
 Welcome to Reduction Pipeline's documentation!
 =============================================================
-This code was developed in order to reduce data taken by the PESTO imager located a l'Obervatoire de Mont Mégantic (OMM) in Québec. This code is not affiliated with OMM. 
+This code was developed in order to reduce data taken by the PESTO imager located a l'Obervatoire de Mont Mégantic (OMM) in Québec. This code is not affiliated with OMM.
 
-Please use and change this code to fit your specific needs. 
+Please use and change this code to fit your specific needs.
 
 To run the code, please edit the example.i file. Then run the following command:
 
@@ -29,18 +29,25 @@ The input file takes the following arguments:
 The code works by executing the following steps on each pointing (or position):
 
     1. Generate Folders for each filter taken
-    
+
     2. Subtracts bias from dome flats and science images
-    
+
     3. Calculate the normalized master dome flat
-    
+
     4. Apply normalized master dome flat to science image
-    
+
     5. Align images using phase cross-correlator
-    
+
     6. Apply astrometric corrections using astrometry.net
-    
-Unforunately, the astrometric corrections do not always pass. If this is the case, I suggest you follow the instructions in the FinalAlignment.ipynb notebook to manually calculate the correct astrometry. Although this is more manual, it is still highly automated :) 
+
+    7. Create mosaic for images that passed astrometric corrections
+
+Unforunately, the astrometric corrections do not always pass. If this is the case, I suggest you follow the instructions in the FinalAlignment.ipynb notebook to manually calculate the correct astrometry. Although this is more manual, it is still highly automated :)
+
+
+Sometimes the OMM team takes an additional central image. If this is the case, run the script again but change the filter_ argument in the input
+file from '_pos' to '_central'. This will create an image "0". Simply run `only_mosaic.py` afterwards to create a composite mosaic :D
+
 
 Pipeline
 ^^^^^^^^
