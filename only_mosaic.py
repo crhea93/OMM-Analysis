@@ -2,6 +2,7 @@
 Routine to mosaic images
 """
 import os
+import time
 import numpy as np
 from astropy.io import fits
 import matplotlib.pyplot as plt
@@ -42,6 +43,11 @@ ax2.set_title('Footprint')
 plt.savefig(output_dir+'/mosaic.png')
 
 print('#-----Making Fits-----#')
-hdu = fits.PrimaryHDU(header=wcs_out.to_header(), data=array)
+hdr = wcs_out.to_header()
+hdr['Creator'] = 'Carter Rhea'
+hdr['Date'] = str(time.time())
+hdr['Filter'] = band
+hdr['Comment'] = 'Combined %s band using %i positions'%(band, len(sci_hdus))
+hdu = fits.PrimaryHDU(header=hdr, data=array)
 hdul = fits.HDUList([hdu])
 hdul.writeto(output_dir+'/'+name+'.fits', overwrite=True)
