@@ -32,33 +32,57 @@ def sort_filters(sys_arg):
     os.chdir(home_dir)
     os.system('gunzip -r *')  # Unzip all zip files if there are any
     for tile_ct in range(0, int(inputs['num_pos'])):
-        filter_images = {}  # {filter: list of image fits}
-        for filename in os.listdir(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)):  # Step through each fits file
-            if filename.endswith('.fits'):  # Only get fits files
-                hdu = fits.open(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+filename)  # Open Fits
-                header = hdu[0].header  # Get Header
-                try:
-                    filter = header['FILTER']  # Get filter
-                except:
-                    filter = header['FILTRE']
-                if filter in filter_images.keys():  # If we already have the filter in the dictionary
-                    filter_images[filter].append(filename)  # add to list of filenames with filter
-                else:  # filter not in dictionary
-                    filter_images[filter] = [filename]  # Start list of filenames in filter
-        filters_ = ''
-        #print('Filters:')
-        for key in filter_images.keys():
-            filters_ += key+' '
-        print('Position: ' + str(tile_ct+1))
-        print('    Filters: ' + filters_)
-        # Create target folder
-        for filter in filter_images.keys():  # Step through each filter
-            # Create new folders for each filter
-
-            if os.path.exists(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+filter):
-                pass
+        try:
+            filter_images = {}  # {filter: list of image fits}
+            if 'central' in inputs['pos_dil']:
+                for filename in os.listdir(home_dir+'/'+target_dir+inputs['pos_dil']):  # Step through each fits file
+                    if filename.endswith('.fits'):  # Only get fits files
+                        hdu = fits.open(home_dir+'/'+target_dir+inputs['pos_dil']+'/'+filename)  # Open Fits
+                        header = hdu[0].header  # Get Header
+                        try:
+                            filter = header['FILTER']  # Get filter
+                        except:
+                            filter = header['FILTRE']
+                        if filter in filter_images.keys():  # If we already have the filter in the dictionary
+                            filter_images[filter].append(filename)  # add to list of filenames with filter
+                        else:  # filter not in dictionary
+                            filter_images[filter] = [filename]  # Start list of filenames in filter
             else:
-                os.mkdir(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+filter)
-            for filename in filter_images[filter]:
-                shutil.copyfile(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+filename, home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+inputs['filter_']+'/'+filename)
-    os.chdir(curr_dir)
+                for filename in os.listdir(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)):  # Step through each fits file
+                    if filename.endswith('.fits'):  # Only get fits files
+                        hdu = fits.open(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+filename)  # Open Fits
+                        header = hdu[0].header  # Get Header
+                        try:
+                            filter = header['FILTER']  # Get filter
+                        except:
+                            filter = header['FILTRE']
+                        if filter in filter_images.keys():  # If we already have the filter in the dictionary
+                            filter_images[filter].append(filename)  # add to list of filenames with filter
+                        else:  # filter not in dictionary
+                            filter_images[filter] = [filename]  # Start list of filenames in filter
+            filters_ = ''
+            #print('Filters:')
+            for key in filter_images.keys():
+                filters_ += key+' '
+            print('Position: ' + str(tile_ct+1))
+            print('    Filters: ' + filters_)
+            # Create target folder
+            for filter in filter_images.keys():  # Step through each filter
+                # Create new folders for each filter
+                if 'central' in inputs['pos_dil']:
+                    if os.path.exists(home_dir+'/'+target_dir+inputs['pos_dil']+'/'+filter):
+                        pass
+                    else:
+                        os.mkdir(home_dir+'/'+target_dir+inputs['pos_dil']+'/'+filter)
+                    for filename in filter_images[filter]:
+                        shutil.copyfile(home_dir+'/'+target_dir+inputs['pos_dil']+'/'+filename, home_dir+'/'+target_dir+inputs['pos_dil']+'/'+inputs['filter_']+'/'+filename)
+                else:
+                    if os.path.exists(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+filter):
+                        pass
+                    else:
+                        os.mkdir(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+filter)
+                    for filename in filter_images[filter]:
+                        shutil.copyfile(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+filename, home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+inputs['filter_']+'/'+filename)
+        except:
+            pass
+        os.chdir(curr_dir)

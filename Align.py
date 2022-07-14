@@ -32,14 +32,18 @@ def align(target_images, debias_sci_list, debias_data_out,flat_debias_sci_list, 
     '''
     hdu = fits.open(target_images[-1])[0]  # Choose last unbiased one to get header info
     zero_shift_image = debias_sci_list[-1]
-    ra = hdu.header['RA']
-    dec = hdu.header['DEC']
     header_zero = WCS(fits.open(target_images[-1])[0].header)
     pixel = Angle(0.459211, u.arcsec)
     header_zero.wcs.crpix = [512, 512] # center pixel
-    header_zero.wcs.crval = [hdu.header['RA'], hdu.header['DEC']] # RA and dec values in hours and degrees
     header_zero.wcs.ctype = ["RA", "DEC"]
     header_zero.wcs.cdelt = [pixel.degree, pixel.degree]
+    try:
+        ra = hdu.header['RA']
+        dec = hdu.header['DEC']
+        header_zero.wcs.crval = [hdu.header['RA'], hdu.header['DEC']] # RA and dec values in hours and degrees
+    except KeyError:
+        header_zero.wcs.crval = [0.0, 0.0] # RA and dec values in hours and degrees
+        
     # Find all shifts for other images:
     imshifts = {} # dictionary to hold the x and y shift pairs for each image
     for image in debias_sci_list:

@@ -1,7 +1,6 @@
 from astroquery.astrometry_net import AstrometryNet
 from astropy.io import fits
 ast = AstrometryNet()
-import time
 
 
 def astrometry(output_dir, tile_ct, sci_stacked, api_key):
@@ -52,9 +51,6 @@ def astrometry(output_dir, tile_ct, sci_stacked, api_key):
 
     if wcs_header:
         # Code to execute when solve succeeds
-        wcs_header['Creator'] = 'Carter'
-        wcs_header['Date'] = str(time.time())
-        wcs_header['Comment'] = 'Aligned image using Astrometry.net'
         hdu = fits.PrimaryHDU(header=wcs_header, data=sci_stacked)
         hdul = fits.HDUList([hdu])
         hdul.writeto(output_dir+'/stacked_correct_%i.fits'%(tile_ct+1), overwrite=True)
