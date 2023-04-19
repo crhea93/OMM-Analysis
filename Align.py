@@ -37,12 +37,12 @@ def align(target_images, debias_sci_list, debias_data_out,flat_debias_sci_list, 
     header_zero.wcs.crpix = [512, 512] # center pixel
     header_zero.wcs.ctype = ["RA", "DEC"]
     header_zero.wcs.cdelt = [pixel.degree, pixel.degree]
-    try:
-        ra = hdu.header['RA']
-        dec = hdu.header['DEC']
-        header_zero.wcs.crval = [hdu.header['RA'], hdu.header['DEC']] # RA and dec values in hours and degrees
-    except KeyError:
-        header_zero.wcs.crval = [0.0, 0.0] # RA and dec values in hours and degrees
+    #try:
+    ra = hdu.header['RA']
+    dec = hdu.header['DEC']
+    header_zero.wcs.crval = [hdu.header['RA'], hdu.header['DEC']] # RA and dec values in hours and degrees
+    #except KeyError:
+    #    header_zero.wcs.crval = [0.0, 0.0] # RA and dec values in hours and degrees
         
     # Find all shifts for other images:
     imshifts = {} # dictionary to hold the x and y shift pairs for each image

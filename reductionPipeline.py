@@ -6,6 +6,6 @@ from mosaic import mosaic
 # Sort by filter
 sort_filters(sys.argv[1])
 # Stack and clean the images. Solve for astrometry
-stack_and_clean(sys.argv[1])
+master_flat = stack_and_clean(sys.argv[1])
 # Create mosaic
-mosaic(sys.argv[1])
+mosaic(sys.argv[1], master_flat)

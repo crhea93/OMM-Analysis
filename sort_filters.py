@@ -29,15 +29,18 @@ def sort_filters(sys_arg):
     inputs = read_input_file(sys_arg)
     home_dir = inputs['home_dir']
     target_dir = inputs['target_dir']
+    target_subfolder = ''
+    if 'target_subfolder' in inputs.keys():
+        target_subfolder = '/'+inputs['target_subfolder']
     os.chdir(home_dir)
     os.system('gunzip -r *')  # Unzip all zip files if there are any
     for tile_ct in range(0, int(inputs['num_pos'])):
         try:
             filter_images = {}  # {filter: list of image fits}
             if 'central' in inputs['pos_dil']:
-                for filename in os.listdir(home_dir+'/'+target_dir+inputs['pos_dil']):  # Step through each fits file
+                for filename in os.listdir(home_dir+'/'+target_dir+inputs['pos_dil']+target_subfolder):  # Step through each fits file
                     if filename.endswith('.fits'):  # Only get fits files
-                        hdu = fits.open(home_dir+'/'+target_dir+inputs['pos_dil']+'/'+filename)  # Open Fits
+                        hdu = fits.open(home_dir+'/'+target_dir+inputs['pos_dil']+target_subfolder+'/'+filename)  # Open Fits
                         header = hdu[0].header  # Get Header
                         try:
                             filter = header['FILTER']  # Get filter
@@ -48,9 +51,9 @@ def sort_filters(sys_arg):
                         else:  # filter not in dictionary
                             filter_images[filter] = [filename]  # Start list of filenames in filter
             else:
-                for filename in os.listdir(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)):  # Step through each fits file
+                for filename in os.listdir(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+target_subfolder):  # Step through each fits file
                     if filename.endswith('.fits'):  # Only get fits files
-                        hdu = fits.open(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+'/'+filename)  # Open Fits
+                        hdu = fits.open(home_dir+'/'+target_dir+inputs['pos_dil']+str(tile_ct+1)+target_subfolder+'/'+filename)  # Open Fits
                         header = hdu[0].header  # Get Header
                         try:
                             filter = header['FILTER']  # Get filter
